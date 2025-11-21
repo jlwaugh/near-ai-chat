@@ -22,9 +22,9 @@ export const Modal = ({
   onClose
 }: ModalProps) => {
   const modalRef = clickOutsideToClose
-    ? // biome-ignore lint/correctness/useHookAtTopLevel: todo
+    ? // biome-ignore lint/correctness/useHookAtTopLevel: click outside only when enabled
       useClickOutside(onClose)
-    : // biome-ignore lint/correctness/useHookAtTopLevel: todo
+    : // biome-ignore lint/correctness/useHookAtTopLevel: use plain ref when disabled
       useRef<HTMLDivElement>(null);
 
   // Stop site overflow when modal is open
@@ -62,7 +62,7 @@ export const Modal = ({
             lastElement.focus();
           }
         } else {
-          // Tab moves focus forward
+          // Tab moves forward
           if (document.activeElement === lastElement) {
             e.preventDefault();
             firstElement.focus();
@@ -78,31 +78,34 @@ export const Modal = ({
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
     };
-  }, [isOpen, onClose, modalRef.current]);
+  }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed top-0 left-0 z-50 flex h-screen w-full items-center justify-center bg-transparent p-6">
-      <div className="fade fixed top-0 left-0 h-full w-full bg-black/5 backdrop-blur-[2px]" />
-
-      <Card
-        className={cn("reveal reveal-sm relative z-50 max-w-md", className)}
-        ref={modalRef}
-        tabIndex={-1}
-      >
-        {children}
-
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-white dark:bg-black text-black dark:text-white">
+      <div className="relative z-50 flex flex-col items-center w-full max-w-3xl p-6">
         <Button
           aria-label="Close Modal"
           shape="square"
-          className="absolute top-2 right-2"
+          className="mb-4 h-8 w-8 rounded-full border border-neutral-700 hover:bg-neutral-800"
           onClick={onClose}
           variant="ghost"
         >
           <X size={16} />
         </Button>
-      </Card>
+
+        <Card
+          className={cn(
+            "relative w-full max-w-4xl max-h-[calc(100vh-7rem)] overflow-y-auto",
+            className
+          )}
+          ref={modalRef}
+          tabIndex={-1}
+        >
+          {children}
+        </Card>
+      </div>
     </div>
   );
 };
